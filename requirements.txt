@@ -1,0 +1,20 @@
+# Python 3.9.23 因为部分依赖需要 Python 3.9 及以上版本
+torch==1.12.1
+torchvision==0.13.1
+transformers==4.17.0
+tensorboardX==2.6.4
+tqdm==4.67.1
+mmcv==2.0.0  
+numpy==1.23.5  # 与PyTorch 1.12.1兼容
+pathlib
+Pillow==9.5.0
+seaborn==0.13.2
+openai-clip==1.0.1
+opencv-python==4.8.0.74  # 视频处理
+moviepy==1.0.3  # 视频处理和编辑
+matplotlib==3.7.1  # 可视化
+pycocotools==2.0.6  # COCO评估工具
+pyyaml==6.0  # 配置文件处理
+requests==2.31.0  # 可能用于下载模型或资源
+scikit-learn==1.2.2  # 数据处理
+scipy==1.10.1  # 科学计算库，与numpy配合
