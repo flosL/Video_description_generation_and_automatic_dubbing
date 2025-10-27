@@ -4,7 +4,16 @@
 
 ## 介绍
 本项目基于 [Video-Captioning-Transformer](https://github.com/Kamino666/Video-Captioning-Transformer)项目魔改，在视频描述生成的基础上添加了TTS自动配音和添加字幕的功能。
-
+# ！！！使用前需要完成的事情
+- 配置腾讯云APIkey，在.env文件中配置TENCENT_SECRET_ID和TENCENT_SECRET_KEY。如下：
+```
+TENCENT_SECRET_ID = ""
+TENCENT_SECRET_KEY = ""
+```
+- 下载已有的或自己训练模型，将模型文件放入checkpoint文件夹中。分别是
+  - clip4clip_msrvtt.pth
+  - clip4clip_msvd.pth
+  默认使用msrvtt模型，若要使用msvd模型，需在run.py中指定model和config文件。
 ## 整合运行脚本run：
 指定视频：
 ```
