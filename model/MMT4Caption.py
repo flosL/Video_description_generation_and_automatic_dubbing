@@ -26,7 +26,13 @@ class MMT4Caption(nn.Module):
         self.loss_beta = model_config['loss_beta']
         self.f_type = None
 
-        self.cap_preprocessor = CapPreprocessor(model_config['tokenizer'], device=device)
+        # 从配置中获取tokenizer_path（如果有）
+        tokenizer_path = model_config.get('tokenizer_path', None)
+        self.cap_preprocessor = CapPreprocessor(
+            model_config['tokenizer'], 
+            device=device,
+            tokenizer_path=tokenizer_path
+        )
         self.text_encoder = TextEncoder(model_config['text_enc_type'], device=device)
         self.cap_decoder = CapDecoder(
             num_layers=model_config['caption_decoder']['layer'],
