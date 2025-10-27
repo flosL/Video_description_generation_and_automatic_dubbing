@@ -84,60 +84,21 @@ def make_text_clip(text, start, duration, video_w, video_h, font_size=None):
         base_font_size = int(video_w * 0.04)  # 4%的宽度作为基础字体大小
         # 限制最大和最小字体大小范围
         font_size = max(24, min(base_font_size, 60))  # 最小24px，最大60px
+    
+    # 直接使用Pillow渲染字幕，避免TextClip错误信息
+    pillow_font_size = max(16, int(font_size * 0.9))  # 调整字体大小
+    img_arr = render_text_to_image(
+        text=text,
+        width=int(video_w * 0.9),
+        font_path=font_path,
+        font_size=pillow_font_size
+    )
+    txt = ImageClip(img_arr)
+    # 为ImageClip设置时间属性（兼容不同moviepy版本）
     try:
-        # 尝试不同版本的moviepy参数格式
-        try:
-            # 新版本moviepy参数格式
-            txt = TextClip(
-                text,
-                font=font_path,
-                fontsize=font_size,
-                color='white',
-                stroke_color='black',
-                stroke_width=3,
-                method='caption',
-                size=(int(video_w * 0.9), None)
-            )
-            # 设置时间属性（兼容不同moviepy版本）
-            try:
-                txt = txt.with_start(start).with_duration(duration)
-            except AttributeError:
-                txt = txt.set_start(start).set_duration(duration)
-        except TypeError:
-            # 旧版本moviepy参数格式
-            txt = TextClip(
-                text=text,
-                font=font_path,
-                font_size=font_size,
-                color='white',
-                stroke_color='black',
-                stroke_width=3,
-                method='caption',
-                size=(int(video_w * 0.9), None)
-            )
-            # 设置时间属性（兼容不同moviepy版本）
-            try:
-                txt = txt.with_start(start).with_duration(duration)
-            except AttributeError:
-                txt = txt.set_start(start).set_duration(duration)
-    except Exception as e:
-            print(f"⚠️ TextClip失败({e})，回退到Pillow渲染")
-            # 调整Pillow渲染时的字体大小，比TextClip稍小一些以确保更好的显示效果
-            pillow_font_size = max(16, int(font_size * 0.9))  # 比TextClip小10%
-            img_arr = render_text_to_image(
-                text=text,
-                width=int(video_w * 0.9),
-                font_path=font_path,
-                font_size=pillow_font_size
-            )
-            txt = ImageClip(img_arr)
-            # 为ImageClip设置时间属性（兼容不同moviepy版本）
-            try:
-                # 尝试使用with_start和with_duration方法
-                txt = txt.with_start(start).with_duration(duration)
-            except AttributeError:
-                # 某些moviepy版本可能使用不同的方法
-                txt = txt.set_start(start).set_duration(duration)
+        txt = txt.with_start(start).with_duration(duration)
+    except AttributeError:
+        txt = txt.set_start(start).set_duration(duration)
 
     # 🎯 字幕位置调整：
     # 上移以确保字幕完全可见，防止被底部遮挡
