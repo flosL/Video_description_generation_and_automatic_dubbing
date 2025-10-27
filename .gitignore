@@ -1,3 +1,11 @@
+# 忽略输入输出文件
+*.mp4
+*.mp3
+*.wav
+# 忽略环境变量文件，包含敏感信息
+.env
+# 忽略output下的字幕json文件
+output/*.json
 
 checkpoint/swin_tiny_patch244_window877_kinetics400_1k.pth
 .idea/inspectionProfiles/profiles_settings.xml
@@ -42,3 +50,11 @@ coco_caption/pycocoevalcap/tokenizer/tmps82e821g
 /checkpoint/swin_tiny.py
 /checkpoint/swin_tiny_patch244_window877_kinetics400_1k.pth
 /checkpoint/swin_tiny_patch244_window877_kinetics400_1k.py
+submodules/video_features
+api_run.py
+tech.md
+checkpoint/clip4clip_msrvtt.pth
+checkpoint/clip4clip_msvd.pth
+data/readme.md
+input/test.json
+submodules/video_features

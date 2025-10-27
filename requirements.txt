@@ -18,3 +18,4 @@ pyyaml==6.0  # 配置文件处理
 requests==2.31.0  # 可能用于下载模型或资源
 scikit-learn==1.2.2  # 数据处理
 scipy==1.10.1  # 科学计算库，与numpy配合
+dotenv==1.1.1  # 加载环境变量

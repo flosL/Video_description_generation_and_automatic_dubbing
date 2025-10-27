@@ -13,6 +13,10 @@ from contextlib import contextmanager
 import io
 import sys
 
+# 导入tts.py中的tts函数
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from tts import tts
+
 # 检查moviepy是否可用
 try:
     from moviepy.editor import VideoFileClip
@@ -72,11 +76,11 @@ def extract_description_from_output(output):
 
 def main():
     # 模型路径
-    DEFAULT_CONFIG_PATH = "configs\\caption-task_baseline_modal_clip4clip_msvd_config.json"
-    DEFAULT_MODEL_PATH = "checkpoint\\clip4clip_msvd.pth"
+    DEFAULT_CONFIG_PATH = "configs\caption-task_baseline_modal_clip4clip_config.json"
+    DEFAULT_MODEL_PATH = "checkpoint/clip4clip_msrvtt.pth"
     # 输入文件路径
     DEFAULT_VIDEO_PATH = "input/test.mp4"
-    DEFAULT_AUDIO_PATH = "input/test.wav"
+    DEFAULT_AUDIO_PATH = None
     DEFAULT_SUBTITLES_PATH = None  # 推理时请设置为None，避免默认加载现有字幕
 
     # 命令行参数解析
@@ -178,31 +182,68 @@ def main():
                 json.dump(subtitle_data, f, ensure_ascii=False, indent=2)
             
             print(f"字幕数据已保存到: {json_output_path}")
+            
+            # 创建tts输出目录
+            tts_output_dir = os.path.join(args.output_dir, "tts")
+            os.makedirs(tts_output_dir, exist_ok=True)
+            
+            # 生成音频文件路径
+            audio_filename = f"{video_id}_audio.mp3"
+            audio_path = os.path.join(tts_output_dir, audio_filename)
+            
+            # 调用tts函数生成音频
+            print(f"正在生成音频...")
+            try:
+                tts(description, audio_path)
+                print(f"音频已生成: {audio_path}")
+                # 将生成的音频路径设置为args.audio，以便后续添加到视频
+                args.audio = audio_path
+            except Exception as e:
+                print(f"生成音频时出错: {e}")
         else:
             print("未能捕获到生成的描述")
 
-    # 生成带字幕的视频
+    # 生成带字幕和配音的视频
     if HAVE_MOVIEPY and subtitle_data:
         try:
-            subtitles = [subtitle_data]  # 使用字幕数据
-            output_video_path = os.path.join(args.output_dir, f"{video_id}_with_subtitles.mp4")
-            add_timed_subtitles(args.video, subtitles, output_video_path)
+            # 最终输出文件路径
+            final_output_path = os.path.join(args.output_dir, f"{video_id}_o.mp4")
             
-            # 如果提供了音频文件，添加音频
+            subtitles = [subtitle_data]  # 使用字幕数据
+            
+            # 如果有音频，直接生成带字幕和音频的最终视频
             if args.audio:
-                audio_output_path = os.path.join(args.output_dir, f"{video_id}_with_subtitles_audio.mp4")
-                print(f"正在添加音频到视频...")
+                print(f"正在生成带字幕和音频的最终视频...")
+                # 先生成带字幕的临时视频
+                temp_subtitle_path = os.path.join(args.output_dir, f"{video_id}_temp_subtitles.mp4")
+                add_timed_subtitles(args.video, subtitles, temp_subtitle_path)
+                
+                # 再添加音频生成最终视频
                 success = add_audio_to_single_video(
-                    video_path=output_video_path,
+                    video_path=temp_subtitle_path,
                     audio_path=args.audio,
-                    output_path=audio_output_path,
+                    output_path=final_output_path,
                     audio_volume=args.audio_volume,
                     replace_original_audio=args.replace_audio
                 )
+                
+                # 删除临时文件
+                if os.path.exists(temp_subtitle_path):
+                    try:
+                        os.remove(temp_subtitle_path)
+                    except Exception:
+                        pass
+                
                 if success:
-                    print(f"音频已成功添加到视频: {audio_output_path}")
+                    print(f"✅ 最终视频已生成: {final_output_path}")
+            else:
+                # 如果没有音频，只生成带字幕的视频作为最终输出
+                print(f"正在生成带字幕的最终视频...")
+                add_timed_subtitles(args.video, subtitles, final_output_path)
+                print(f"✅ 最终视频已生成: {final_output_path}")
+                
         except Exception as e:
-            print(f"生成带字幕视频或添加音频时出错: {e}")
+            print(f"生成最终视频时出错: {e}")
 
     else:
         if not subtitle_data:
