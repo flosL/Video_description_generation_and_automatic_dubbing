@@ -4,3 +4,12 @@
 
 ## 介绍
 本项目基于 [Video-Captioning-Transformer](https://github.com/Kamino666/Video-Captioning-Transformer)项目魔改，在视频描述生成的基础上添加了TTS自动配音功能。
+
+## 整合运行脚本run：
+指定视频：python run.py -v input/your_video.mp4
+
+## 使用predict：
+```
+python predict_video.py -c configs/caption-task_baseline_modal_clip4clip_config.json -m checkpoint/clip4clip_msrvtt.pth -v input/test.mp4 --feat_type CLIP4CLIP-ViT-B-32 --ext_type uni_12 --greedy --cpu
+```
+
