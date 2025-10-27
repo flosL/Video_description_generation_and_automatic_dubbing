@@ -48,13 +48,13 @@ def add_audio_to_single_video(video_path, audio_path, output_path,
         print(f"音频时长: {audio_duration:.2f}秒")
         
         if audio_duration > video_duration:
-            # 如果音频比视频长，截取音频
-            print("音频比视频长，正在截取音频...")
+            # 如果音频比视频长，截取音频并给出提醒
+            print("⚠️  提醒: 音频比视频长，将截断音频以匹配视频长度")
+            print("正在截取音频...")
             audio_clip = audio_clip.subclip(0, video_duration)
         elif audio_duration < video_duration:
-            # 如果音频比视频短，循环音频
-            print("音频比视频短，正在循环音频...")
-            audio_clip = audio_clip.loop(duration=video_duration)
+            # 如果音频比视频短，直接使用原始音频长度（不循环）
+            print("⚠️  提醒: 音频比视频短，音频结束后视频将无声")
         
         # 设置音频到视频
         if replace_original_audio:
